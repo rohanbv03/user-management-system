@@ -1,28 +1,23 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
+import { FaEnvelope, FaLock } from "react-icons/fa";
 import api from "../api";
 
 function Login() {
-
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
     email: "",
-    password: ""
+    password: "",
   });
 
-  const handleSubmit = async e => {
+  const [error, setError] = useState("");
 
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-
-      const res =
-        await api.post(
-          "/login",
-          form
-        );
+      const res = await api.post("/login", form);
 
       localStorage.setItem(
         "token",
@@ -32,44 +27,96 @@ function Login() {
       navigate("/profile");
 
     } catch (err) {
-
-      alert(
-        err.response?.data?.message
+      setError(
+        err.response?.data?.message ||
+        "Invalid credentials"
       );
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
 
-      <h2>Login</h2>
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-slate-950 to-purple-900/20" />
 
-      <input
-        placeholder="Email"
-        onChange={e =>
-          setForm({
-            ...form,
-            email: e.target.value
-          })
-        }
-      />
+      <div className="relative w-full max-w-md">
 
-      <input
-        type="password"
-        placeholder="Password"
-        onChange={e =>
-          setForm({
-            ...form,
-            password: e.target.value
-          })
-        }
-      />
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
 
-      <button>
-        Login
-      </button>
+          <h1 className="text-4xl font-bold text-white text-center">
+            AuthFlow
+          </h1>
 
-    </form>
+          <p className="text-slate-400 text-center mt-2 mb-8">
+            Welcome Back
+          </p>
+
+          {error && (
+            <div className="mb-4 bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-5"
+          >
+
+            <div className="relative">
+              <FaEnvelope className="absolute left-4 top-4 text-slate-400" />
+
+              <input
+                type="email"
+                placeholder="Email Address"
+                className="w-full bg-slate-900/70 border border-slate-700 rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-blue-500 transition"
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    email: e.target.value,
+                  })
+                }
+              />
+            </div>
+
+            <div className="relative">
+              <FaLock className="absolute left-4 top-4 text-slate-400" />
+
+              <input
+                type="password"
+                placeholder="Password"
+                className="w-full bg-slate-900/70 border border-slate-700 rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-blue-500 transition"
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    password: e.target.value,
+                  })
+                }
+              />
+            </div>
+
+            <button
+              className="w-full bg-blue-600 hover:bg-blue-700 transition-all duration-300 py-3 rounded-xl text-white font-semibold"
+            >
+              Sign In
+            </button>
+
+          </form>
+
+          <p className="text-center text-slate-400 mt-6">
+            Don't have an account?{" "}
+            <Link
+              to="/"
+              className="text-blue-400 hover:text-blue-300"
+            >
+              Create Account
+            </Link>
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
   );
 }
 
